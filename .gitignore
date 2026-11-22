@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+.upstream/
+.env
+*.log
+.tmp/
+server/.data/
+infra/**/*.json
+!infra/**/bicepconfig.json

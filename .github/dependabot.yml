@@ -1,0 +1,37 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /server
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types: [minor, patch]
+      azure-otel:
+        patterns:
+          - "@azure/*"
+          - "@opentelemetry/*"
+    labels: [dependencies]
+
+  - package-ecosystem: docker
+    directories:
+      - /server
+      - /engines/regular
+      - /engines/simples
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ["*"]
+    labels: [dependencies]

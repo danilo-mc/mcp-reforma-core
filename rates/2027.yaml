@@ -1,0 +1,53 @@
+# Alíquotas de referência para 2027 — usadas para injetar no motor oficial em datas >= 2027-01-01.
+#
+# ATENÇÃO: TODAS AS ENTRADAS ABAIXO SÃO MARCADORES. TODO(VALIDAR)
+# Nenhum valor foi preenchido de memória (SPEC §7 e §14). Cada entrada precisa ser validada pelo
+# mantenedor contra a fonte primária (LC 214/2025, resolução do Senado Federal, MP 1.399/2026)
+# antes de qualquer deploy público. Enquanto `valor` for null, a entrada é "pendente": aparece em
+# `consultar_aliquotas`, mas NUNCA é usada em cálculo. `npm run rates:check:strict` falha até lá.
+#
+# Governança: veja rates/README.md (PR com link da fonte + mudança de `version`).
+version: "2026-11-21"
+descricao: "Alíquotas de referência 2027 (CBS, IBS UF, IBS município, IS) — marcadores pendentes de validação"
+entries:
+  # TODO(VALIDAR) — CBS 2027. A SPEC cita como referência provisória o TCU, Acórdão 2933/2026
+  # (data 2026-10-28), pendente de resolução do Senado. Conferir valor, fonte, URL e data na fonte primária.
+  - tributo: CBS
+    vigencia: { inicio: 2027-01-01, fim: 2027-12-31 }
+    valor: null # TODO(VALIDAR)
+    situacao: provisoria
+    fonte: null # TODO(VALIDAR) — referência citada na SPEC: "TCU, Acórdão 2933/2026"
+    url_fonte: ""
+    data_fonte: null # TODO(VALIDAR)
+    notas: "Prazo do Senado: até 15/12/2026; se não houver resolução até 22/12, vale a do TCU."
+
+  # TODO(VALIDAR) — IBS (parcela estadual) 2027: valores e fonte na LC 214/2025.
+  - tributo: IBS_UF
+    vigencia: { inicio: 2027-01-01, fim: 2027-12-31 }
+    valor: null # TODO(VALIDAR)
+    situacao: provisoria
+    fonte: null # TODO(VALIDAR) — LC 214/2025
+    url_fonte: ""
+    data_fonte: null # TODO(VALIDAR)
+    notas: "Validar valores e fonte na LC 214/2025."
+
+  # TODO(VALIDAR) — IBS (parcela municipal) 2027.
+  - tributo: IBS_MUN
+    vigencia: { inicio: 2027-01-01, fim: 2027-12-31 }
+    valor: null # TODO(VALIDAR)
+    situacao: provisoria
+    fonte: null # TODO(VALIDAR) — LC 214/2025
+    url_fonte: ""
+    data_fonte: null # TODO(VALIDAR)
+    notas: "Validar valores e fonte na LC 214/2025."
+
+  # TODO(VALIDAR) — Imposto Seletivo sobre bebidas açucaradas: validar na MP 1.399/2026.
+  - tributo: IS
+    produto: bebidas_acucaradas
+    vigencia: { inicio: 2027-01-01, fim: 2027-12-31 }
+    valor: null # TODO(VALIDAR)
+    situacao: provisoria
+    fonte: null # TODO(VALIDAR) — MP 1.399/2026
+    url_fonte: ""
+    data_fonte: null # TODO(VALIDAR)
+    notas: "Validar na MP 1.399/2026."

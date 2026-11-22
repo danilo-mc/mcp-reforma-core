@@ -1,0 +1,1 @@
+{"objetos":[{"nObj":1,"estadoItem":"INCONSISTENCIA_ENTRADA","erros":[{"type":"http://engine-regular/api/calculadora/observabilidade/erros?codigo=REG-005","title":"Classificação tributária não encontrada","code":"REG-005","pointer":"#/itens/0/cClassTrib","detail":"Classificação tributária não encontrada para código 510002 e data 2026-01-01 (CBS e IBS)"}]}]}

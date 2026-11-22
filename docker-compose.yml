@@ -1,0 +1,112 @@
+# mcp-reforma — local stack
+#
+#   docker compose up -d --build            # server + official engines
+#   docker compose up -d engine-regular engine-simples   # engines only
+#
+# The engines are built from the official ReceitaFederal repositories at the commits pinned
+# in engines/versions.env. The defaults below MUST match that file (the upstream-tracker
+# updates both); to override, either export the variables or run
+#   docker compose --env-file engines/versions.env up -d --build
+#
+# Server host port: 3000 (override with MCP_SERVER_PORT=3300 if 3000 is taken).
+#
+# Host ports of the engines are published on 127.0.0.1 for diagnostics only; the server talks
+# to them through the private network `engines` by service name.
+
+name: mcp-reforma
+
+x-engine-defaults: &engine-defaults
+  restart: unless-stopped
+  networks: [engines]
+  read_only: true
+  tmpfs:
+    - /tmp:exec,mode=1777   # sqlite-jdbc extracts its native library to /tmp (needs exec)
+  security_opt:
+    - no-new-privileges:true
+  cap_drop: [ALL]
+
+services:
+  engine-regular:
+    <<: *engine-defaults
+    image: mcp-reforma/engine-regular:${UPSTREAM_REGULAR_SHA:-f1eebd7ce3157423b1a6aaca7dc1d6c3395452c4}
+    build:
+      context: ./engines/regular
+      args:
+        UPSTREAM_REPO: ${UPSTREAM_REGULAR_REPO:-ReceitaFederal/calculadora-rtc-regime-regular}
+        UPSTREAM_SHA: ${UPSTREAM_REGULAR_SHA:-f1eebd7ce3157423b1a6aaca7dc1d6c3395452c4}
+        UPSTREAM_VERSION: ${UPSTREAM_REGULAR_VERSION:-1.7.2-1-gf1eebd7}   # OCI version label only (git describe)
+    environment:
+      SPRING_PROFILES_ACTIVE: offline
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75
+    ports:
+      - "127.0.0.1:18080:8080"   # API, context path /api (diagnostics only)
+    mem_limit: 1536m
+    cpus: 2
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9101/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+  engine-simples:
+    <<: *engine-defaults
+    image: mcp-reforma/engine-simples:${UPSTREAM_SIMPLES_SHA:-a926d5a76095ac0295a6612a9a54db7ffead2396}
+    build:
+      context: ./engines/simples
+      args:
+        UPSTREAM_REPO: ${UPSTREAM_SIMPLES_REPO:-ReceitaFederal/calculadora-rtc-simples-nacional}
+        UPSTREAM_SHA: ${UPSTREAM_SIMPLES_SHA:-a926d5a76095ac0295a6612a9a54db7ffead2396}
+        UPSTREAM_VERSION: ${UPSTREAM_SIMPLES_VERSION:-1.0.2-1-ga926d5a}   # OCI version label only (git describe)
+        UPSTREAM_REGULAR_REPO: ${UPSTREAM_REGULAR_REPO:-ReceitaFederal/calculadora-rtc-regime-regular}
+        UPSTREAM_REGULAR_SHA: ${UPSTREAM_REGULAR_SHA:-f1eebd7ce3157423b1a6aaca7dc1d6c3395452c4}
+    environment:
+      SPRING_PROFILES_ACTIVE: offline
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75
+    ports:
+      - "127.0.0.1:18082:8082"   # API, context path /api (diagnostics only)
+    mem_limit: 1536m
+    cpus: 2
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:9103/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+
+  mcp-server:
+    image: mcp-reforma/server:local
+    build:
+      context: .                     # repository root (rates/ is baked in)
+      dockerfile: server/Dockerfile
+      args:
+        UPSTREAM_REGULAR_SHA: ${UPSTREAM_REGULAR_SHA:-f1eebd7ce3157423b1a6aaca7dc1d6c3395452c4}
+        UPSTREAM_SIMPLES_SHA: ${UPSTREAM_SIMPLES_SHA:-a926d5a76095ac0295a6612a9a54db7ffead2396}
+    restart: unless-stopped
+    networks: [engines]
+    ports:
+      - "${MCP_SERVER_PORT:-3000}:3000"   # host port overridable if 3000 is taken
+    environment:
+      MCP_TRANSPORT: http
+      PORT: "3000"
+      ENGINE_REGULAR_URL: http://engine-regular:8080/api
+      ENGINE_SIMPLES_URL: http://engine-simples:8082/api
+      RATE_LIMIT_PER_MIN: ${RATE_LIMIT_PER_MIN:-60}   # per IP on /mcp; 0 disables (local load tests)
+      UPSTREAM_REGULAR_SHA: ${UPSTREAM_REGULAR_SHA:-f1eebd7ce3157423b1a6aaca7dc1d6c3395452c4}
+      UPSTREAM_SIMPLES_SHA: ${UPSTREAM_SIMPLES_SHA:-a926d5a76095ac0295a6612a9a54db7ffead2396}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/livez').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    depends_on:
+      engine-regular:
+        condition: service_healthy
+      engine-simples:
+        condition: service_healthy
+
+networks:
+  engines:
+    name: mcp-reforma-engines

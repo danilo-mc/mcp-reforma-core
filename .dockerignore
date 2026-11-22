@@ -1,0 +1,13 @@
+# Build context is the repository root (see server/Dockerfile).
+.git
+.github
+.upstream
+**/node_modules
+**/dist
+**/coverage
+**/.tmp
+**/.data
+**/*.log
+.env
+**/.env
+server/test

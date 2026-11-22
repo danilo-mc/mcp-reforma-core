@@ -1,0 +1,84 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "24"
+
+jobs:
+  server:
+    name: server (lint, typecheck, unit, integration, build, rates)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run test:integration
+      - run: npm run build
+      - name: Validar rates/ (schema, fontes, sobreposição)
+        run: npm run rates:check
+
+  golden:
+    name: golden (motores oficiais em Docker)
+    runs-on: ubuntu-latest
+    needs: server
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Carregar SHAs fixados do upstream
+        run: grep -E '^[A-Z_]+=' engines/versions.env >> "$GITHUB_ENV"
+      - name: Build dos motores (regime regular e Simples Nacional)
+        run: docker compose build engine-regular engine-simples
+      - name: Subir motores
+        run: |
+          docker compose up -d --no-build --wait --wait-timeout 300 engine-regular engine-simples
+          docker compose ps
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Testes golden (MCP × motor direto)
+        working-directory: server
+        env:
+          ENGINE_REGULAR_URL: http://localhost:18080/api
+          ENGINE_SIMPLES_URL: http://localhost:18082/api
+        run: |
+          npm ci
+          npm run test:golden
+      - name: Logs dos motores (falha)
+        if: failure()
+        run: docker compose logs --no-color --tail 300
+      - name: Derrubar a pilha
+        if: always()
+        run: docker compose down -v
+
+  image:
+    name: imagem do servidor
+    runs-on: ubuntu-latest
+    needs: server
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: docker build (server/Dockerfile, contexto = raiz)
+        run: docker build -f server/Dockerfile -t mcp-reforma/server:ci .

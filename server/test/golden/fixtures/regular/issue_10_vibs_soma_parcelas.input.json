@@ -1,0 +1,24 @@
+{
+  "id": "6194602ea71cbf9431c236de4409d920",
+  "versao": "1.0.0",
+  "dhFatoGerador": "2033-06-01T12:00:00-03:00",
+  "municipio": 3550308,
+  "uf": "SP",
+  "tpDoc": 55,
+  "itens": [
+    {
+      "numero": 1,
+      "ncm": "22011000",
+      "cst": "000",
+      "cClassTrib": "000001",
+      "baseCalculo": 11752.5,
+      "quantidade": 1,
+      "unidade": "UN",
+      "aliquotasNominais": {
+        "cbs": 8.8,
+        "ibsEstadual": 14.7,
+        "ibsMunicipal": 3.0
+      }
+    }
+  ]
+}

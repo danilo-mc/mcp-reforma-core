@@ -1,0 +1,54 @@
+MCP da Reforma (mcp-reforma)
+Copyright (c) 2026 Danilo Castro
+Licenciado sob a licença MIT (ver LICENSE).
+
+Projeto pessoal, independente e NÃO OFICIAL. Não tem vínculo com a Receita
+Federal do Brasil, com qualquer órgão público ou com qualquer empregador, e não
+usa o nome, o logotipo ou as cores da Receita Federal.
+
+-------------------------------------------------------------------------------
+Componentes de terceiros
+-------------------------------------------------------------------------------
+
+Este projeto executa, sem nenhuma modificação de código, os seguintes
+componentes de código aberto publicados pela Receita Federal do Brasil. Eles
+são obtidos dos repositórios oficiais em commits fixados (ver engines/ e a
+ferramenta `versao`) e compilados/empacotados em imagens de container. Nenhum
+arquivo-fonte desses repositórios é alterado nem redistribuído neste
+repositório; eventuais contornos de build ficam nos Dockerfiles de engines/ e
+são reportados aos projetos originais.
+
+1. calculadora-rtc-regime-regular
+   https://github.com/ReceitaFederal/calculadora-rtc-regime-regular
+   Calculadora de CBS, IBS e Imposto Seletivo — regime regular (Java/Spring Boot).
+   MIT License — Copyright (c) 2026 Receita Federal do Brasil
+
+2. calculadora-rtc-simples-nacional
+   https://github.com/ReceitaFederal/calculadora-rtc-simples-nacional
+   Calculadora para empresas do Simples Nacional (Java).
+   MIT License — Copyright (c) 2026 Receita Federal do Brasil
+
+
+Texto da licença MIT dos componentes acima (conforme cada repositório):
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+As imagens de container dos motores também incluem dependências de terceiros
+dos próprios projetos oficiais (por exemplo, bibliotecas Java e Go), sujeitas
+às respectivas licenças indicadas nesses projetos.
