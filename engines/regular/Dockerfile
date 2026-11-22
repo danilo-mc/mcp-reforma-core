@@ -23,7 +23,7 @@ ARG UPSTREAM_VERSION=1.7.2-1-gf1eebd7
 ############################
 # 1. Fetch upstream sources
 ############################
-FROM alpine:3.22 AS src
+FROM alpine:3.24 AS src
 ARG UPSTREAM_REPO
 ARG UPSTREAM_SHA
 RUN apk add --no-cache git
