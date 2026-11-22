@@ -25,7 +25,7 @@ ARG UPSTREAM_REGULAR_SHA=f1eebd7ce3157423b1a6aaca7dc1d6c3395452c4
 ############################
 # 1. Fetch upstream sources
 ############################
-FROM alpine:3.22 AS src
+FROM alpine:3.24 AS src
 ARG UPSTREAM_REPO
 ARG UPSTREAM_SHA
 ARG UPSTREAM_REGULAR_REPO
